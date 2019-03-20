@@ -20,7 +20,7 @@ dependencies {
     compile 'io.dropwizard.metrics:metrics-core:4.0.+'
     compile 'org.codehaus.groovy:groovy-all:2.4.+'
     compile 'org.redisson:redisson:3.10.+'
-    compile 'org.slf4j:slf4j-api'
+    compile 'org.slf4j:slf4j-simple:1.7.+'
 }
 
 wrapper {
