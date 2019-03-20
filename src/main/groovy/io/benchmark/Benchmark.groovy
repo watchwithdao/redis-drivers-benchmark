@@ -10,10 +10,9 @@ import java.util.concurrent.TimeUnit
 
 class Benchmark {
 
-    private final int[] threads = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+    private final int[] totalThreadPools = [1, 2, 4, 8, 16, 32, 64, 128, 256]
     private MetricRegistry metrics
     private ConsoleReporter reporter
-
     private Bench<Object> bench
 
     Benchmark(Bench<?> bench) {
@@ -22,50 +21,42 @@ class Benchmark {
     }
 
     void run(String[] args) throws InterruptedException {
-        int threads = 64
-        int iteration = 100000
-        int connections = 10
-        String host = "redis://127.0.0.1:6379"
-        if (args.length > 0) {
-            threads = Integer.valueOf(args[0]) //64;
-            iteration = Integer.valueOf(args[1])//100;
-            connections = Integer.valueOf(args[2])//10
+        String metricName = 'Redisson'
+        int totalIterations = 100000
+        int totalConnections = 10
+        String host = 'redis://127.0.0.1:6379'
+        if (args) {
+            metricName = args[0]
+            totalIterations = Integer.valueOf(args[1])
+            totalConnections = Integer.valueOf(args[2])
             host = args[3]
         }
-        run(threads, iteration, connections, host);
+        run(metricName, totalIterations, totalConnections, host)
     }
 
-    void run(int threads, final int iterations, int connections, String host) throws InterruptedException {
-
-        for (final int threadsAmount : this.threads) {
-            final Object client = bench.createInstance(connections, host)
-            ExecutorService e = Executors.newFixedThreadPool(threadsAmount)
-
-            metrics = SharedMetricRegistries.getOrCreate("redisson")
-
+    void run(String metricName, final int totalIterations, int totalConnections, String host) throws InterruptedException {
+        for (final int threads : this.totalThreadPools) {
+            final Object client = bench.createInstance(totalConnections, host)
+            ExecutorService e = Executors.newFixedThreadPool(threads)
+            metrics = SharedMetricRegistries.getOrCreate(metricName)
             reporter = ConsoleReporter.forRegistry(metrics)
                     .convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MICROSECONDS)
                     .build()
-
-            for (threadNumber in 1..threadsAmount) {
+            for (thread in 1..threads) {
                 e.execute(new Runnable() {
                     @Override
                     void run() {
-                        (1..iterations).each { bench.executeOperation("${it}", client, threadNumber, it, metrics) }
+                        (1..totalIterations).each { bench.executeOperation("${it}", client, thread, metrics) }
                     }
-
                 })
             }
-
-            SharedMetricRegistries.remove("redisson")
-
+            SharedMetricRegistries.remove(metricName)
             e.shutdown()
             if (e.awaitTermination(30, TimeUnit.MINUTES)) {
-                println("Total threads: " + threadsAmount)
+                println("Total threads: " + threads)
                 reporter.report()
             }
-
             bench.shutdown(client)
         }
     }

@@ -12,15 +12,13 @@ class SetAddBenchmark {
     static void main(String[] args) throws InterruptedException {
         Bench<RedissonClient> bench = new RedissonBench() {
             @Override
-            void executeOperation(String data, RedissonClient benchInstance, int threadNumber, int iteration,
-                                         MetricRegistry metrics) {
+            void executeOperation(String data, RedissonClient benchInstance, int threadNumber, MetricRegistry metrics) {
                 RSet<String> set = benchInstance.getSet("set_${threadNumber}")
                 Timer.Context time = metrics.timer("set").time()
                 set.add(data)
                 time.stop()
             }
         }
-
         Benchmark benchmark = new Benchmark(bench)
         benchmark.run(args)
     }
