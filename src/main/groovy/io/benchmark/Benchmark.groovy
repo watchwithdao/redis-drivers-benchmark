@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 class Benchmark {
 
-    private final int[] totalThreadPools = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+    private final int[] totalThreadPools = [1, 2, 4, 8, 16, 32, 64]
     private MetricRegistry metrics
     private ConsoleReporter reporter
     private Bench<Object> bench

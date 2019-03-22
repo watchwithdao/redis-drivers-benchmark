@@ -14,14 +14,18 @@ apply plugin: 'io.spring.dependency-management'
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url 'https://redisson.pro/repo/'
+    }
 }
 
 dependencies {
     compile 'io.dropwizard.metrics:metrics-core:4.0.+'
     compile 'io.lettuce:lettuce-core:5.1.+'
     compile 'org.codehaus.groovy:groovy-all:2.4.+'
-    compile 'org.redisson:redisson:3.10.+'
+//    compile 'org.redisson:redisson:3.10.+'
     compile 'org.slf4j:slf4j-simple:1.7.+'
+    compile 'pro.redisson:redisson:3.10.4'
 }
 
 wrapper {
